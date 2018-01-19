@@ -28,9 +28,33 @@ CREATE TABLE ratings (
   movieID INT,
   rating INT,
   time INT)
-ROW FORMAT DELIMTED
+ROW FORMAT DELIMTIED
 FIELDS TERMINATED BY '/t'
 STORED AS TEXTFILE;
 
 LOAD DATA LOCAL INPATH '${env:HOME}/ml-100k/u.data'
 OVERWRITE INTO TABLE ratings;
+
+#EXTERNAL TABLE VS MANAGED
+CREATE EXTERNAL TABLE IF NOT EXISTS ratings (
+  userID INT,
+  movieID INT,
+  rating INT,
+  time INT)
+ROW FORMAT DELIMTIED
+FIELDS TERMINATED BY '/t'
+
+LOCATION '/data/ml-100k/u.data';
+
+#PARTITIONING
+
+- we can store data in partitioned subdirectories
+
+CREATE TABLE customers (
+  name STRING,
+  address STRUCT <street:STRING,city:STRING,state:STRING,zip:INT>
+)
+PARTITIONED BY(country STRING);
+ 
+  ---SAVED AS-- ../customers/country=CA/
+                ../customers/country=GB/

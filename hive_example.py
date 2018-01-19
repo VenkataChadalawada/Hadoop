@@ -58,3 +58,15 @@ PARTITIONED BY(country STRING);
  
   ---SAVED AS-- ../customers/country=CA/
                 ../customers/country=GB/
+
+ # creating average top rated movies with rating count more than 10   
+    
+CREATE VIEW topRatingAvgs AS
+SELECT movieID, AVG(ratings) as ratingAvg, COUNT(ratings) as ratingCount
+FROM u
+GROUP BY movieID
+ORDER BY ratingAvg DESC;
+
+SELECT n.title, ratingAvg
+FROM topRatingAvgs t JOIN names n ON t.movieID = n.movieID
+WHERE ratingCount > 10;

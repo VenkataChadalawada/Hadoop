@@ -20,3 +20,17 @@ FROM topMovieIDs t JOIN names n ON t.movieID = n.movieID;
 
 #TO DELETE A VIEW
 DROP VIEW topmovieIDs
+
+#creating table and loading data into hive
+
+CREATE TABLE ratings (
+  userID INT,
+  movieID INT,
+  rating INT,
+  time INT)
+ROW FORMAT DELIMTED
+FIELDS TERMINATED BY '/t'
+STORED AS TEXTFILE;
+
+LOAD DATA LOCAL INPATH '${env:HOME}/ml-100k/u.data'
+OVERWRITE INTO TABLE ratings;

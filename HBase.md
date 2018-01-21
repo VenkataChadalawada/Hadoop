@@ -16,9 +16,9 @@ Python client> restService > HBase > HDFS
 ```usr/hdp/current/hbase-master/bin/hbase-daemon.sh start rest -p 8002 --infoport 8003```
 - open canopy & write a python client to get the data from local into HBASE
 - pip install starbase which is used to connect to hbase
-``` !pip install git+https://github.com/barseghyanartur/starbase@stable#egg=starbase --upgrade
-!pip list
-%run "~/Documents/ULTIMATE HADOOP/Untitled.py" ```
+- To install a pip module- !pip install git+https://github.com/barseghyanartur/starbase@stable#egg=starbase --upgrade
+- To list all installed pip modules- !pip list
+- To run python file in canopy- %run "~/Documents/ULTIMATE HADOOP/Untitled.py"
 
 ``` python
 from starbase import Connection

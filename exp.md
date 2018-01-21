@@ -11,4 +11,11 @@
 - creating tables in mysql writing complex queries with joins groups in mysql
 - importing mysql tables into hdfs and hive using sqoop
 - exporting tables from hdfs to mysql using sqoop
-
+- runing hbase server and connecting to it through python client & importing data into Hbase via starbase & portforwarding
+- interacting through Hbase shell and creating tables, scanning, dropping
+- using pig to import data into HBase using pig.backend.hadoop.hbase.HBaseStorage
+- Installing Datastax Cassandra in the hortonworks centos sandbox and cqlsh for shell interaction
+- Cassandra - wrting CQL commands, creating keyspaces and tables
+- performing analytics using spark in cassandra
+- creating a spark session, getting the raw data converting that to a DataFrame and writing it into Cassandra
+- Reading it back from cassandra into a new dataframe 

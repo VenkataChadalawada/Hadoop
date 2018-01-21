@@ -57,19 +57,19 @@ To stop the Hbase rest client
 
 # HBase with Pig to import data at scale
 - to open a hbase shell
-hbase shell
+### hbase shell
 - to list the tables in Hbase
-list
+### list
 - create a table users with column userinfo
-create 'users','userinfo'
+### create 'users','userinfo'
 - to take a peek again
-list
+### list
 - to exit out of hbase
-exit
+### exit
 - download a script 
 eg:- wget https://media.sundog-soft.com/hadoop/hbase.pig
 - to take a look
-nano hbase.pig 
+### nano hbase.pig 
 ``` python
 users = LOAD '/user/maria_dev/ml-100k/u.user'
 USING PigStorage('|')
@@ -80,13 +80,13 @@ USING org.apache.pig.backend.hadoop.hbase.HBaseStorage (
 'userinfo:age,userinfo:gender,userinfo:occupation,userinfo:zip');
 ```
 - to run in pig
-pig hbase.pig
+### pig hbase.pig
 - now to take a peek on how data looks in hbase go to hbase shell
-hbase shell
+### hbase shell
 list 
-scan 'users'
+### scan 'users'
 - to drop a table first diable it
-disable 'users'
-drop 'users'
+### disable 'users'
+### drop 'users'
 -to exit out of shell
-exit
+### exit

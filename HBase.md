@@ -51,7 +51,7 @@ print("Ratings for user ID 1:\n")
 print(ratings.fetch("1"))
 print("ratings for user ID 2:\n")
 print (ratings.fetch("33")) 
-    ```
+```
 To stop the Hbase rest client
 ``` usr/hdp/current/hbase-master/bin/hbase-daemon.sh stop rest -p 8002 --infoport 8003 ```
 

@@ -81,6 +81,7 @@ SELECT * FROM users;
 ## first get the script 
 wget http://media.sundog-soft.com/hadoop/CassandraSpark.py
 ## to use data sets we need to use sprak 2.0
+### using spark to insert data into cassandra
 export SPARK_MAJOR_VERSION=2
 ``` python
 from pyspark.sql import SparkSession
@@ -122,4 +123,16 @@ if __name__ == "__main__":
 
     # Stop the session
     spark.stop()
-    ```
+```
+
+### running script file in spark
+spark-submit --packages datastax:spark-cassandra-connector:2.0.0-M2-s_2.11 CassandraSpark.py 
+## let's see the data actually in there
+cqlsh --cqlversion="3.4.0"
+## use keyspace movielens
+use movielens;
+## peek on data
+select * from users limit 10;
+## exit & stop service
+exit
+service cassandra stop

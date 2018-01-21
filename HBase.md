@@ -53,7 +53,7 @@ print("ratings for user ID 2:\n")
 print (ratings.fetch("33")) 
     ```
 To stop the Hbase rest client
-``` usr/hdp/current/hbase-master/bin/hbase-daemon.sh stop rest -p 8002 --infoport 8003```
+``` usr/hdp/current/hbase-master/bin/hbase-daemon.sh stop rest -p 8002 --infoport 8003 ```
 
 # HBase with Pig to import data at scale
 - to open a hbase shell

@@ -15,3 +15,30 @@
  sqoop import --connect jdbc:mysql://localhost/movielens --driver
  com.mysql.jdbc.Driver --table movies
  
+ #INCREMENTAL IMPORTS
+ 
+ --we can keep our relational databsase and Hadoop in sync
+ -- --check-coloum and --last-value
+ 
+ SQOOP: EXPORT DATA FROM HIVE TO MYSQL
+ # this command sucks out movies from mysql table and copies it on hdfs cluster
+ 
+ sqoop export --connect jdbc:mysql://localhost/movielens -m 1 --driver
+ com.mysql.jdbc.Driver --table exported_movies --export-dir
+ /apps/hive/warehouse/movies --input-fields-terminated-by '\0001'
+ (target table must already exist in MYSQL,with columns in expected order)
+ 
+ # EXAMPLES
+ 
+ #IMPORT MOVIELENS DATA INTO A MYSQL DATABASE
+ 
+ 
+ #IMPORT THE MOVIES TO HDFS
+ 
+ #IMPORT THE MOVIES INTO HIVE
+ 
+ #EXPORT THE MOVIES BACK INTO MYSQL
+ 
+   
+    
+ 

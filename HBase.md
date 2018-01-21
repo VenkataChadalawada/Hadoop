@@ -1,4 +1,4 @@
-#HBase
+# HBase
 - A type of Nosql DB
 - HBase is row oriented
 - zookkeeper > HMaster servers > Region Servers > HDFS
@@ -7,7 +7,7 @@
 # Importing Movie ratings into HBase
 Python client> restService > HBase > HDFS
 
-#HBase start
+# HBase start
 - go to Hbase & service_actions > start
 - go to virtual box >right click >settings>network>port forwarding> create a new port for HBase REST 
 - I created at 8002 port on localhost
@@ -15,6 +15,11 @@ Python client> restService > HBase > HDFS
 ``` su root ``` & a****
 ```usr/hdp/current/hbase-master/bin/hbase-daemon.sh start rest -p 8002 --infoport 8003```
 - open canopy & write a python client to get the data from local into HBASE
+- pip install starbase which is used to connect to hbase
+``` !pip install git+https://github.com/barseghyanartur/starbase@stable#egg=starbase --upgrade
+!pip list
+%run "~/Documents/ULTIMATE HADOOP/Untitled.py" ```
+
 ``` python
 from starbase import Connection
 
@@ -47,4 +52,4 @@ print(ratings.fetch("1"))
 print("ratings for user ID 2:\n")
 print (ratings.fetch("33")) 
     ```
-    
+

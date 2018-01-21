@@ -52,4 +52,41 @@ print(ratings.fetch("1"))
 print("ratings for user ID 2:\n")
 print (ratings.fetch("33")) 
     ```
+To stop the Hbase rest client
+```usr/hdp/current/hbase-master/bin/hbase-daemon.sh stop rest -p 8002 --infoport 8003```
 
+# HBase with Pig to import data at scale
+- to open a hbase shell
+hbase shell
+- to list the tables in Hbase
+list
+- create a table users with column userinfo
+create 'users','userinfo'
+- to take a peek again
+list
+- to exit out of hbase
+exit
+- download a script 
+eg:- wget https://media.sundog-soft.com/hadoop/hbase.pig
+- to take a look
+nano hbase.pig 
+``` python
+users = LOAD '/user/maria_dev/ml-100k/u.user'
+USING PigStorage('|')
+AS (userID:int, age:int, gender:chararray, occupation:chararray, zip:int);
+
+STORE users INTO 'hbase://users'
+USING org.apache.pig.backend.hadoop.hbase.HBaseStorage (
+'userinfo:age,userinfo:gender,userinfo:occupation,userinfo:zip');
+```
+- to run in pig
+pig hbase.pig
+- now to take a peek on how data looks in hbase go to hbase shell
+hbase shell
+list 
+scan 'users'
+- to drop a table first diable it
+disable 'users'
+drop 'users'
+-to exit out of shell
+exit

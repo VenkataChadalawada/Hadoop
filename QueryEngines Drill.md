@@ -22,9 +22,130 @@ We will import data into Hive & MongoDB
 Set up Drill on top of both
 and do some queries
 
-- Go to hive editor & create database
+##### Go to hive editor & create database
 create database movielens;
 
-- Now transfer movielens data into MongoDB too using spark
+##### Now transfer movielens data into MongoDB too using spark
+spark-submit --packages org.mongodb.spark:mongo-spark-connector_2.11:2.2.0 MongoSpark.py
+
+#### Download apache drill (find the download mirror tar file link in google & in terminal do wget)
+wget http://mirror.stjschools.org/public/apache/drill/drill-1.12.0/apache-drill-1.12.0.tar.gz
+
+#### unzip
+tar -xvf apache-drill-1.12.0.tar.gz 
+
+#### starting Drill into another port 
+bin/drillbit.sh start -Ddrill.exec.http.port=8765
+this opens up Drill on http://localhost:8765/
+
+### go to Query 
+show databases;
+we have hive.movielens (ratings table as u), mongo.movielens(users table (collection)
+
+#### take a peek onto hive
+select * from hive.movielens.u LIMIT 10;
+
+#### take a peel onto mongoDB
+select * from mongo.movielens.users LIMIT 10;
+
+#### lets combine - how many ratings break down by occupation
+SELECT u.occupation, count( * ) FROM hive.movielens.u r JOIN mongo.movielens.users u ON r.user_id = u.user_id GROUP BY u.occupation
+
+#### stop the drill & mongoDB
+bin/drillbit.sh stop
+go to Ambari services & stop MongoDB service
+
+## Apache Pheonix
+- It mainly works with HBase that supports transactions
+- Fast lowlatency - OLTP support
+- Originally developed by Salesforce, then opensourced
+- Exposes a JDBC connector for HBase - we can also connects to any system using JDBC eg- Tableau
+- supports secondary indices and user-defined functions
+- Integartes with Mapreduce, Spark, Hive, Pig, and Flume
+- Pheonix is really fast. you probably won't pay a performance cost from having this extra layer on top of HBase
+- Why Phoenix & not Drill - Choose right tool for the job
+- why phoenix and not HBase's native clients? 
+  - your apps, and analysts may find SQL easier to work with.
+  - Phoenix can do the work of optimizing more complex queries for you
+  - But remember HBase is still fundementally non-relational
+
+### Phoenix Architecture
+- It has Pheonix Client(parsing, queryplan) on top of HBase API
+- Each HBase Region server has an Phoenix Co-Processor attached to it 
+
+### Using Phoenix
+- Command Line Interface CLI
+- Phoenix APU for Java
+- JDBC driver(thick client)
+- Phoenix Query Server(PQS) (thin client)
+  - Intended to eventually enable non-JVM access
+-JAR's for mapReduce, Hive, Pig, Flume, Spark
+
+### Let's play Phoenix
+- Install on HDP
+- mess arround with the CLI
+- set up a users table for Movielens
+- store and load data to it through the Pig Integration
+
+#### install using yum
+yum install phoenix
+- this installs in /usr/hdp/current/phoenix-client/
+- ls
+
+#### open up CLI for Phoenix
+[root@sandbox-hdp phoenix-client]# cd bin
+[root@sandbox-hdp bin]# python sqlline.py
+
+#### List the tables
+!tables
+0: jdbc:phoenix:> !tables
++------------+--------------+-------------+---------------+----------+------------+----------------------------+---------+
+| TABLE_CAT  | TABLE_SCHEM  | TABLE_NAME  |  TABLE_TYPE   | REMARKS  | TYPE_NAME  | SELF_REFERENCING_COL_NAME  | REF_GEN |
++------------+--------------+-------------+---------------+----------+------------+----------------------------+---------+
+|            | SYSTEM       | CATALOG     | SYSTEM TABLE  |          |            |                            |         |
+|            | SYSTEM       | FUNCTION    | SYSTEM TABLE  |          |            |                            |         |
+|            | SYSTEM       | SEQUENCE    | SYSTEM TABLE  |          |            |                            |         |
+|            | SYSTEM       | STATS       | SYSTEM TABLE  |          |            |                            |         |
++------------+--------------+-------------+---------------+----------+------------+----------------------------+---------+
+0: jdbc:phoenix:> 
+
+#### creating a table & putting a compound key on it
+CREATE TABLE IF NOT EXISTS us_population ( state CHAR(2) NOT NULL, city VARCHAR NOT NULL, population BIGINT CONSTRAINT my_pk PRIMARY KEY (state, city));
+0: jdbc:phoenix:> CREATE TABLE IF NOT EXISTS us_population ( state CHAR(2) NOT NULL, city VARCHAR NOT NULL, population BIGINT CONSTRAINT my_pk PRIMARY KEY (state, city));
+No rows affected (1.31 seconds)
+0: jdbc:phoenix:> !tables
++------------+--------------+----------------+---------------+----------+------------+----------------------------+------+
+| TABLE_CAT  | TABLE_SCHEM  |   TABLE_NAME   |  TABLE_TYPE   | REMARKS  | TYPE_NAME  | SELF_REFERENCING_COL_NAME  | REF_ |
++------------+--------------+----------------+---------------+----------+------------+----------------------------+------+
+|            | SYSTEM       | CATALOG        | SYSTEM TABLE  |          |            |                            |      |
+|            | SYSTEM       | FUNCTION       | SYSTEM TABLE  |          |            |                            |      |
+|            | SYSTEM       | SEQUENCE       | SYSTEM TABLE  |          |            |                            |      |
+|            | SYSTEM       | STATS          | SYSTEM TABLE  |          |            |                            |      |
+|            |              | US_POPULATION  | TABLE         |          |            |                            |      |
++------------+--------------+----------------+---------------+----------+------------+----------------------------+------+
+0: jdbc:phoenix:> 
+#### insert data into Phoenix 
+note - no INSERT in Phoenix , it has UPSERT
+UPSERT INTO US_POPULATION VALUES ('NY', 'New York', 8143197);
+UPSERT INTO US_POPULATION VALUES ('CA', 'Los Angeles', 3843197);
+
+#### view tables
+SELECT * FROM US_POPULATION;
+
+SELECT * FROM US_POPULATION WHERE STATE='CA';
++--------+--------------+-------------+
+| STATE  |     CITY     | POPULATION  |
++--------+--------------+-------------+
+| CA     | Los Angeles  | 3843197     |
++--------+--------------+-------------+
+1 row selected (0.071 seconds)
+0: jdbc:phoenix:> 
+
+#### delete table us_population
+DROP TABLE US_POPULATION
+
+#### quit
+!quit
+
 
 

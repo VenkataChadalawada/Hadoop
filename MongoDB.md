@@ -55,6 +55,24 @@ git clone https://github.com/nikunjness/mongo-ambari.git
 #### restart Ambari
 sudo service ambari restart
 
+### Now you have MongoDB in the sandbox
+- Login to sandbox as root
+ssh maria_dev@127.0.0.1 -p2222
+maria_dev
+
+su root
+A*** 3
+
+- Install pymongo to interact in python
+pip install pymongo
+
+#### Let's add some data into MongoDB using spark dataframe
+- get the script
+wget http://media.sundog-soft.com/hadoop/MongoSpark.py
+- use spark 2 as we have both in the sandbox
+export SPARK_MAJOR_VERSION=2
+
+
 
 
 

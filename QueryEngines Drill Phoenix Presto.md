@@ -148,4 +148,108 @@ DROP TABLE US_POPULATION
 !quit
 
 
+### Use movie lens's user table - write a pig script that uses phoenix to write and store users data table(relation in pig) into HBase via Phoenix and read it back and do queries on it phoenix
+cd into /usr/hdp/current/phoenix-client/bin
+##### open up the cli & create a table first
+python sqlline.py
+
+REATE TABLE users ( USERID INTEGER NOT NULL, AGE INTEGER, GENDER CHAR(1), OCCUPATION VARCHAR, ZIP VARCHAR CONSTRAINT pk PRIMARY KEY (USERID));
+No rows affected (2.39 seconds)
+0: jdbc:phoenix:> ! tables
++------------+--------------+-------------+---------------+----------+------------+----------------------------+---------+
+| TABLE_CAT  | TABLE_SCHEM  | TABLE_NAME  |  TABLE_TYPE   | REMARKS  | TYPE_NAME  | SELF_REFERENCING_COL_NAME  | REF_GEN |
++------------+--------------+-------------+---------------+----------+------------+----------------------------+---------+
+|            | SYSTEM       | CATALOG     | SYSTEM TABLE  |          |            |                            |         |
+|            | SYSTEM       | FUNCTION    | SYSTEM TABLE  |          |            |                            |         |
+|            | SYSTEM       | SEQUENCE    | SYSTEM TABLE  |          |            |                            |         |
+|            | SYSTEM       | STATS       | SYSTEM TABLE  |          |            |                            |         |
+|            |              | USERS       | TABLE         |          |            |                            |         |
++------------+--------------+-------------+---------------+----------+------------+----------------------------+---------+
+0: jdbc:phoenix:> 
+ ##### quit 
+ ! quit
+ 
+ ##### check if you have ml-100k in home directory
+ cd /home/maria_dev
+ 
+ ##### get the pig script
+ wget https://media.sundog-soft.com/hadoop/phoenix.pig
+
+##### script
+``` python
+REGISTER /usr/hdp/current/phoenix-client/phoenix-client.jar
+
+users = LOAD '/user/maria_dev/ml-100k/u.user'
+USING PigStorage('|')
+AS (USERID:int, AGE:int, GENDER:chararray, OCCUPATION:chararray, ZIP:chararray);
+
+STORE users into 'hbase://users' using
+    org.apache.phoenix.pig.PhoenixHBaseStorage('localhost','-batchSize 5000');
+
+occupations = load 'hbase://table/users/USERID,OCCUPATION' using org.apache.phoenix.pig.PhoenixHBaseLoader('localhost');
+
+grpd = GROUP occupations BY OCCUPATION;
+cnt = FOREACH grpd GENERATE group AS OCCUPATION,COUNT(occupations);
+DUMP cnt;
+
+```
+Thus, We have stored users data from movielens into HBase through Phoenix
+
+Load back the userid, occupation from users table in Hbase using pig.PhoenixHBaseLoader connector class which makes pig talk to Phoenix
+#### Run it in Pig
+pig phoenix.pig 
+
+cd /usr/hdp/current/phoenix-client/bin
+
+python sqlline.py
+
+!table
+
+SELECT * FROM users LIMIT 10;
+
+DROP TABLE users;
+
+!tables
+
+!quit
+
+## PRESTO
+### what is Presto
+- It can connect to many different BigData databases and data stores at once and query across them
+- Familiar SQL syntax
+- notonly a database itself - works like a layer
+- its like Drill
+- Optimized for OLAP- analytical queries, data warehousing
+- Developed and still partially maintained by Facebook
+- Developed, and still partially maintained by Facebook
+- Exposes JDBC, CommandLine and Tableau
+### Why Presto?
+Vs Drill? It has Cassandra connector for one thing
+If it is good enough for Facebook
+Facebok uses Presto for interactie queries against several internal data stores, including their 300PB data warehouse. Over 1000 Facebook employees use Presto daily to run more than 30000 queries that in total scan over a petabyte each per day
+- Also used by DropBox and AirBNB
+- A single Presto query can combine data from multiple sources, allowing for analytics across your entire organization"
+Presto Breaks the false choice between having fast analytics using an expensive commerical solution that requires excessive hardware
+
+what can presto connect to?
+- cassandra (It's Facebook, afterall)
+- Hive
+- MongoDB
+- MySQL
+- Local files
+- and stuff like Kafka, JMX, PostgreSql, Redis, Accumulo
+
+### Lets just dive in
+- Set up Presto
+- Query our Hive ratings table using Presto
+- Spin Cassandra up, and query our table in Cassandra with presto
+- Execute a query that joins users in Cassandra with ratings in Hive!
+
+## Installation Presto
+go presto site copy the tar ball link
+& go to our terminal sandbox and do wget
+https://prestodb.io/docs/current/installation/deployment.html
+wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.193/presto-server-0.193.tar.gz
+#### untar example
+tar -xvf name.tar.gz
 

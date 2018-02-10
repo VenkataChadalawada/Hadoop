@@ -251,5 +251,36 @@ go presto site copy the tar ball link
 https://prestodb.io/docs/current/installation/deployment.html
 wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.193/presto-server-0.193.tar.gz
 #### untar example
-tar -xvf name.tar.gz
+tar -xvf presto-server-0.194.tar.gz
+cd presto-server-0.194
+#### Set up presto config
+// he already did enough config for the sandbox which you can download
+wget http://media.sundog-soft.com/hadoop/presto-hdp-config.tgz
+tar -xvf presto-hdp-config.tgz
+#### if you wanna take a peek on those files
+cd etc
+vi config.properties 
+vi node.properties 
+cd catalog/
+vi hive.properties 
+cd.. cd..
+[root@sandbox-hdp bin]# pwd
+/home/maria_dev/presto-server-0.194/bin
+[root@sandbox-hdp bin]# mv presto-cli-0.194-executable.jar presto
+#### changing into exectuable mode
+chmod +x presto
+#### start here & check web interface
+[root@sandbox-hdp presto-server-0.194]# pwd
+/home/maria_dev/presto-server-0.194
+[root@sandbox-hdp presto-server-0.194]# bin/launcher start
+Started as 10039
+[root@sandbox-hdp presto-server-0.194]# 
+Now it will open up in http://localhost:8090/
+
+#### Open presto cli in terminal
+[root@sandbox-hdp presto-server-0.194]# bin/presto --server 127.0.0.1:8090 --catalog hive
+presto> 
+
+
+cd etc
 

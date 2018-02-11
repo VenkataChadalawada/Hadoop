@@ -178,4 +178,43 @@ vi workflow.xml
 </workflow-app>
 ```
 
+wget http://media.sundog-soft.com/hadoop/job.properties
+``` xml
+nameNode=hdfs://sandbox.hortonworks.com:8020
+jobTracker=http://sandbox.hortonworks.com:8050
+queueName=default
+oozie.use.system.libpath=true
+oozie.wf.application.path=${nameNode}/user/maria_dev
 
+[root@sandbox-hdp bin]# hadoop fs -put workflow.xml /user/maria_dev
+[root@sandbox-hdp bin]# hadoop fs -put oldmovies.sql /user/maria_dev
+#### new mysql connector into OOZIE
+[root@sandbox-hdp bin]# hadoop fs -put /usr/share/java/mysql-connector-java.jar /user/oozie/share/lib/lib_20171110144231/sqoop
+
+
+```
+[root@sandbox-hdp maria_dev]# oozie job -oozie http://localhost:11000/oozie -config /home/maria_dev/job.properties -run
+Error: E0501 : E0501: Could not perform authorization operation, Call From sandbox-hdp.hortonworks.com/172.17.0.2 to sandbox.hortonworks.com:8020 failed on connection exception: java.net.ConnectException: Connection refused; For more details see:  http://wiki.apache.org/hadoop/ConnectionRefused
+
+The above didn't work
+#### error - resolved
+ensure you are in maria_dev not somewhere inside
+change sandbox.hortonworks to sandbox-hdp.hortonworks  in job.properties
+``` properties
+nameNode=hdfs://sandbox-hdp.hortonworks.com:8020
+jobTracker=http://sandbox-hdp.hortonworks.com:8050
+queueName=default
+oozie.use.system.libpath=true
+oozie.wf.application.path=${nameNode}/user/maria_dev
+~
+```
+
+
+
+[root@sandbox-hdp maria_dev]# oozie job -oozie http://localhost:11000/oozie -config /home/maria_dev/job.properties -run
+job: 0000000-180211092145512-oozie-oozi-W
+
+#### To Take a look at OOZIE
+goto localhost:11000/oozie
+
+### you can explore the job as you see its running now , you can double click and take a peek on DAG etc

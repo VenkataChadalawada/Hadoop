@@ -2,6 +2,7 @@
 - hands on with Hortonworks sandbox
 - worked on Ambari interface
 - wrote mapreduce programs in python
+- Good understanding on YARN
 - experienced in writing pig scripts in piglatin
 - executed hive queries on Ambari hive interface
 - created spark program to extract toprated movies & least ranked movies in both Spark & Spark 2.0
@@ -36,3 +37,4 @@ Query Engines
 - Spin Cassandra up, and query our table in Cassandra with presto
 - Execute a query that joins users in Cassandra with ratings in Hive!
 
+- hands on with zookeeper

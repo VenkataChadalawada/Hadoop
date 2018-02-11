@@ -38,3 +38,4 @@ Query Engines
 - Execute a query that joins users in Cassandra with ratings in Hive!
 
 - hands on with zookeeper
+- setting up a Oozie workflow that gets data from mysql & puts into Hive

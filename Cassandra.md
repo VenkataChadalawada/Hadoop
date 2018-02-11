@@ -31,7 +31,6 @@ uses:
 ## updating the sandbox
 yum update
 python -V
-yum install
 yum install scl-utils
 ### Horton works sanbox runs on cent-os it needs python2.6 however we need python2.7 for cassandra, so we need something that manage release versions
 yum install centos-release-scl-rh

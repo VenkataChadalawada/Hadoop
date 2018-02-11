@@ -277,10 +277,219 @@ Started as 10039
 [root@sandbox-hdp presto-server-0.194]# 
 Now it will open up in http://localhost:8090/
 
-#### Open presto cli in terminal
+#### Open presto cli in terminal & connect to hive
 [root@sandbox-hdp presto-server-0.194]# bin/presto --server 127.0.0.1:8090 --catalog hive
 presto> 
 
+#### you can now see the tables in hive here
+presto> select * from default.ratings limit 10;
+ user_id | movie_id | rating |   other   
+---------+----------+--------+-----------
+     196 |      242 |      3 | 881250949 
+     186 |      302 |      3 | 891717742 
+      22 |      377 |      1 | 878887116 
+     244 |       51 |      2 | 880606923 
+     166 |      346 |      1 | 886397596 
+     298 |      474 |      4 | 884182806 
+     115 |      265 |      2 | 881171488 
+     253 |      465 |      5 | 891628467 
+     305 |      451 |      3 | 886324817 
+       6 |       86 |      3 | 883603013 
+(10 rows)
 
-cd etc
+Query 20180205_134408_00006_9cqjg, FINISHED, 1 node
+Splits: 18 total, 18 done (100.00%)
+0:03 [1.02K rows, 647KB] [379 rows/s, 240KB/s]
+
+presto> select * from default.ratings where rating=5 limit 10;
+ user_id | movie_id | rating |   other   
+---------+----------+--------+-----------
+     253 |      465 |      5 | 891628467 
+     286 |     1014 |      5 | 879781125 
+     200 |      222 |      5 | 876042340 
+     122 |      387 |      5 | 879270459 
+      38 |       95 |      5 | 892430094 
+     160 |      234 |      5 | 876861185 
+     278 |      603 |      5 | 891295330 
+     287 |      327 |      5 | 875333916 
+     246 |      201 |      5 | 884921594 
+     242 |     1137 |      5 | 879741196 
+(10 rows)
+
+Query 20180205_134618_00007_9cqjg, FINISHED, 1 node
+Splits: 18 total, 18 done (100.00%)
+0:01 [62K rows, 647KB] [71.9K rows/s, 750KB/s]
+
+presto> 
+
+presto> select count(*) from default.ratings where rating=1;
+ _col0 
+-------
+  6110 
+(1 row)
+
+Query 20180205_134703_00008_9cqjg, FINISHED, 1 node
+Splits: 18 total, 18 done (100.00%)
+0:01 [100K rows, 647KB] [98.1K rows/s, 634KB/s]
+
+presto> 
+
+#### quit & stop the launcher
+presto> exit
+[root@sandbox-hdp presto-server-0.194]# bin/launcher stop
+Stopped 10039
+
+#### Query cassandra using Presto
+[root@sandbox-hdp maria_dev]# sudo su root
+[root@sandbox-hdp maria_dev]# scl enable python27 bash
+[root@sandbox-hdp maria_dev]# python -V
+Python 2.7.13
+[root@sandbox-hdp maria_dev]# service cassandra start
+Starting Cassandra: OK
+[root@sandbox-hdp maria_dev]# nodetool enablethrift
+[root@sandbox-hdp maria_dev]# cqlsh
+[root@sandbox-hdp maria_dev]# cqlsh --cqlversion="3.4.0"
+describe keyspaces;
+//ensure you have cassandra python27 scl and users table inside cassandra which you can follow from cassandra.md file
+
+cqlsh> use movielens ;
+cqlsh:movielens> select * from users limit 10;
+
+ user_id | age | gender | occupation | zip
+---------+-----+--------+------------+-------
+     769 |  39 |      M |  executive | 06927
+      23 |  30 |      F |     artist | 48197
+     114 |  27 |      M | programmer | 75013
+     660 |  26 |      M |    student | 77380
+     893 |  25 |      M |    student | 95823
+      53 |  26 |      M | programmer | 55414
+     878 |  50 |      F |   educator | 98027
+     110 |  19 |      M |    student | 77840
+      91 |  55 |      M |  marketing | 01913
+     128 |  24 |      F |  marketing | 20009
+
+(10 rows)
+cqlsh:movielens> 
+
+#### lets do some analysis by combining hive and cassandra using presto. 
+We need to write some config for cassandra
+[root@sandbox-hdp presto-server-0.194]# cd etc/catalog/
+[root@sandbox-hdp catalog]# ls
+hive.properties  jmx.properties
+[root@sandbox-hdp catalog]# vi cassandra.properties
+[root@sandbox-hdp catalog]# cat cassandra.properties 
+connector.name=cassandra
+cassandra.contact-points=127.0.0.1
+
+#### Now connecting to both hive & cassandra
+
+[root@sandbox-hdp catalog]# cd ..
+[root@sandbox-hdp etc]# cd ..
+[root@sandbox-hdp presto-server-0.194]# bin/launcher start
+Started as 24067
+[root@sandbox-hdp presto-server-0.194]# bin/presto --server 127.0.0.1:8090 --catalog hive,cassandra
+presto> 
+
+#### query cassandra
+presto> show tables from cassandra.movielens;
+ Table 
+-------
+ users 
+(1 row)
+
+Query 20180211_061226_00000_by63m, FINISHED, 1 node
+Splits: 18 total, 18 done (100.00%)
+0:02 [1 rows, 24B] [0 rows/s, 10B/s]
+
+presto> describe cassandra.movielens.users;
+   Column   |  Type   | Extra | Comment 
+------------+---------+-------+---------
+ user_id    | integer |       |         
+ age        | integer |       |         
+ gender     | varchar |       |         
+ occupation | varchar |       |         
+ zip        | varchar |       |         
+(5 rows)
+
+Query 20180211_061305_00001_by63m, FINISHED, 1 node
+Splits: 18 total, 18 done (100.00%)
+0:00 [5 rows, 329B] [10 rows/s, 681B/s]
+
+presto> select * from cassandra.movielens.users limit 10;
+ user_id | age | gender | occupation |  zip  
+---------+-----+--------+------------+-------
+     466 |  22 | M      | student    | 90804 
+     904 |  17 | F      | student    | 61073 
+      38 |  28 | F      | other      | 54467 
+     606 |  28 | M      | programmer | 63044 
+     319 |  38 | M      | programmer | 22030 
+     392 |  52 | M      | writer     | 59801 
+     298 |  44 | M      | executive  | 01581 
+     187 |  26 | M      | educator   | 16801 
+     668 |  29 | F      | writer     | 10016 
+     661 |  28 | M      | programmer | 98121 
+(10 rows)
+
+Query 20180211_061354_00002_by63m, FINISHED, 1 node
+Splits: 117 total, 117 done (100.00%)
+0:01 [319 rows, 319B] [386 rows/s, 386B/s]
+
+#### query hive from presto 
+presto> select * from hive.default.ratings limit 10;
+ user_id | movie_id | rating |   other   
+---------+----------+--------+-----------
+     196 |      242 |      3 | 881250949 
+     186 |      302 |      3 | 891717742 
+      22 |      377 |      1 | 878887116 
+     244 |       51 |      2 | 880606923 
+     166 |      346 |      1 | 886397596 
+     298 |      474 |      4 | 884182806 
+     115 |      265 |      2 | 881171488 
+     253 |      465 |      5 | 891628467 
+     305 |      451 |      3 | 886324817 
+       6 |       86 |      3 | 883603013 
+(10 rows)
+
+Query 20180211_061421_00003_by63m, FINISHED, 1 node
+Splits: 18 total, 18 done (100.00%)
+0:10 [1.02K rows, 647KB] [98 rows/s, 62.1KB/s]
+
+#### Lets combine both hive & cassandra
+presto> select u.occupation, count(*) from hive.default.ratings r join cassandra.movielens.users u on r.user_id = u.user_id group by u.occupation;
+  occupation   | _col1 
+---------------+-------
+ salesman      |   856 
+ homemaker     |   299 
+ other         | 10663 
+ librarian     |  5273 
+ marketing     |  1950 
+ lawyer        |  1345 
+ entertainment |  2095 
+ artist        |  2308 
+ doctor        |   540 
+ engineer      |  8175 
+ technician    |  3506 
+ student       | 21957 
+ retired       |  1609 
+ programmer    |  7801 
+ healthcare    |  2804 
+ executive     |  3403 
+ scientist     |  2058 
+ none          |   901 
+ administrator |  7479 
+ writer        |  5536 
+ educator      |  9442 
+(21 rows)
+
+Query 20180211_061643_00004_by63m, FINISHED, 1 node
+Splits: 354 total, 354 done (100.00%)
+0:08 [101K rows, 648KB] [12.2K rows/s, 78.2KB/s]
+#### Quit
+presto> quit
+[root@sandbox-hdp presto-server-0.194]# bin/launcher stop
+Stopped 24067
+[root@sandbox-hdp presto-server-0.194]# service cassandra stop
+Shutdown Cassandra: OK
+[root@sandbox-hdp presto-server-0.194]# 
+
 

@@ -39,3 +39,12 @@ Query Engines
 
 - hands on with zookeeper
 - setting up a Oozie workflow that gets data from mysql & puts into Hive
+- creating a new notebook with spark in zeppelin
+- Adjusting the priority order with spark as top in Zeppelin
+- dowloading raw data into sandbox & executing hadoop -put to move the data into HDFS
+- writing spark in scala to analyze the data by creating classes & dataframes executed in shell comands
+- exposed spark dataframes as sql tables & analyzed some queries
+- joins groups orders of the data sets and visualize them in barcharts pie charts line graphs in Zeppelin
+
+Streaming
+- creating a producer & consumer kafka flow with a topic 

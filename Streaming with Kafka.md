@@ -43,7 +43,19 @@ venkata
 
 ## lets publish some data into it
 //sample producer app that talks to kafka & produces data into kafka
-[maria_dev@sandbox-hdp bin]$ ./kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic venkata
+- [maria_dev@sandbox-hdp bin]$ ./kafka-console-producer.sh --broker-list sandbox.hortonworks.com:6667 --topic venkata
+
+where:
 --broker-list - specifies the kafka server itself
 so what it does is it listens anything on venkata
+
+### Lets consume via consumers
+- open up another terminal , cd /usr/hdp/current/kafka-broker/bin
+- ./kafka-console-consumer.sh --bootstrap-server sandbox.hortonworks.com:6667 --zookeeper localhost:2181 --topic venkata --from-beginning
+
+--from-beginning gives all the data from beginning
+
+
+
+
 

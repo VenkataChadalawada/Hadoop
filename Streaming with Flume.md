@@ -117,3 +117,33 @@ a1.sources.r1.channels = c1
 a1.sinks.k1.channel = c1
 
 ```
+### create directories we gonna be using
+I'm in home maria dev
+mkdir spool
+[maria_dev@sandbox-hdp ~]$ mkdir spool
+[maria_dev@sandbox-hdp ~]$ ls
+CassandraSpark.py  job.properties       presto-server-0.194.tar.gz  u.data
+example.conf       ml-100k              spark-warehouse             u.data.1
+flumelogs.conf     presto-server-0.194  spool
+
+We also gonna setup our folder on HDFS that things gonna go into
+Login to Ambari -> filesview
+goto user/maria_dev create a new folder "flume"
+
+### now run flume with this new conf above from flume-server dir
+[maria_dev@sandbox-hdp flume-server]$ bin/flume-ng agent --conf conf --conf-file ~/flumelogs.conf --name a1 -Dflume.root.logger=INFO,console
+
+### download some logs & copy that into our spool dir
+ wget http://media.sundog-soft.com/hadoop/access_log_small.txt
+[maria_dev@sandbox-hdp ~]$ cp access_log_small.txt spool/venkata_logs.txt
+[maria_dev@sandbox-hdp ~]$ cd spool/
+[maria_dev@sandbox-hdp spool]$ ls
+venkata_logs.txt.COMPLETED
+- notice that Flume has processed that and appended .COMPLETED to it.
+
+### now observe output data in Ambari usr/maria_dev/flume in our config sepcified way
+:) That's flume
+
+Now how to process this streaming data ? = Spark Streaming / Apache Storm/ Flink
+
+

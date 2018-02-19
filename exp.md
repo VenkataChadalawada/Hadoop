@@ -47,4 +47,15 @@ Query Engines
 - joins groups orders of the data sets and visualize them in barcharts pie charts line graphs in Zeppelin
 
 Streaming
-- creating a producer & consumer kafka flow with a topic 
+Kafka
+- creating a producer & consumer kafka flow with a topic.
+Flume
+- Construct a Flume agent which has source:netCat , Channel :memory, Sink:Logger
+- Log spool to HDFS = Spool real log files , setup SpoolDir source that monitors a directory for new files dropped into it, built a timestamp interceptor
+insert a header to address what time it logged in, then push through a memory channel got to a HDFS sink, not only write data but structure hiararchy year month date
+
+Analyzing Streams
+SparkStreaming
+- set up Flume to use a spooldir source, use an Avro Sink to connect through our spark streaming job 
+- use a window to aggregate how often each url appears from the access logs
+
